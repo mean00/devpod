@@ -61,23 +61,6 @@ RUN apt-get install -y \
   && :
     #libaften-dev \
 
-# App image
-RUN wget --no-proxy https://github.com/AppImageCrafters/appimage-builder/releases/download/v1.1.0/appimage-builder-1.1.0-x86_64.AppImage && \
-chmod +x appimage-builder-1.1.0-x86_64.AppImage && \
-  mv appimage-builder-1.1.0-x86_64.AppImage /usr/local/bin/appimage-builder
-
-RUN wget --no-proxy https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage -O /usr/local/bin/linuxdeploy && \
-      chmod +x /usr/local/bin/linuxdeploy
-
-RUN  wget --no-proxy https://github.com/linuxdeploy/linuxdeploy-plugin-appimage/releases/download/continuous/linuxdeploy-plugin-appimage-x86_64.AppImage \
-    -O /usr/local/bin/linuxdeploy-plugin-appimage  && \
-    wget --no-proxy https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage   \
-    -O /usr/local/bin/linuxdeploy-plugin-qt  && \
-    wget --no-proxy https://github.com/AppImage/type2-runtime/releases/download/continuous/runtime-x86_64   \
-    -O /usr/local/bin/runtime-x86_64   && \
-    wget --no-proxy https://github.com/AppImage/appimagetool/releases/download/1.9.0/appimagetool-x86_64.AppImage \
-    -O /usr/local/bin/appimagetool1 && \
-    chmod +x /usr/local/bin/*
 RUN useradd -m bullseye && usermod --shell /usr/bin/zsh bullseye
 RUN chmod a+rwx /opt /usr/local/bin
 #
@@ -90,8 +73,6 @@ RUN chmod a+rwx /opt /usr/local/bin
 # 
 # 
 # 
-  RUN  apt-get install  -y \
-    golang 
 
     #libfaac-dev \
     #libfdk-aac-dev \
@@ -100,26 +81,16 @@ RUN chmod a+rwx /opt /usr/local/bin
 # 
 CMD [ "/bin/bash" ]
 
+# install golang
+RUN cd /tmp && wget https://go.dev/dl/go1.23.6.linux-amd64.tar.gz && tar -C /usr/local -xzf go1.23.6.linux-amd64.tar.gz
 
+# Add to PATH (add this to ~/.bashrc or ~/.zshrc)
 
 ###################################
 # Setup user env
 ###################################
 USER ${USERNAME}
 RUN mkdir ~/.local &&  mkdir ~/.local/bin &&  mkdir ~/.cargo && mkdir ~/.cargo/bin
-RUN echo "export http_proxy=\"\"">> ~/.bashrc
-RUN echo "export https_proxy=\"\"">> ~/.bashrc
-RUN echo "export HTTP_PROXY=\"\"">> ~/.bashrc
-RUN echo "export HTTPS_PROXY=\"\"">> ~/.bashrc
-RUN echo "export PATH=\$PATH:\$HOME/.cargo/bin:\$HOME/.local/bin"  >> ~/.bashrc
-RUN echo ".  \$HOME/.cargo/env" >> /home/$USERNAME/.bashrc
-ENV http_proxy=""
-ENV https_proxy=""
-ENV HTTP_PROXY=""
-ENV HTTPS_PROXY=""
-# Extact imagetool 
-#
-RUN cd /tmp  && /usr/local/bin/appimagetool1 --appimage-extract && mv squashfs-root /opt/appimagetool-extracted 
 #
 RUN cat <<EOF > /home/bullseye/.zshrc
 # History Settings
@@ -140,7 +111,7 @@ alias ls='ls --color=auto'
 alias ll='ls -lah'
 EOF
 # give access to image tool
-ENV PATH="/opt/appimagetool-extracted/usr/bin/:$PATH"
+ENV PATH="/usr/local/go/bin/:$PATH"
 
 
 
