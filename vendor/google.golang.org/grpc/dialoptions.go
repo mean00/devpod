@@ -667,7 +667,7 @@ func defaultDialOptions() dialOptions {
 			BufferPool:      mem.DefaultBufferPool(),
 		},
 		bs:              internalbackoff.DefaultExponential,
-		idleTimeout:     30 * time.Minute,
+		idleTimeout:     90 * time.Minute,
 		defaultScheme:   "dns",
 		maxCallAttempts: defaultMaxCallAttempts,
 	}
